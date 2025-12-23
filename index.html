@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Song List - Twitch 點歌清單</title>
+    <title>Pipi Beats - Song List</title>
     <style>
         /* =========================================
            CSS 負責樣式 (Standardized Styles)
@@ -16,10 +16,11 @@
             --text-main: #efeff1;
             --text-dim: #adadb8;
             --border-color: #303032;
+            --tag-bg: #323239;
         }
 
         body {
-            font-family: "Inter", "Roobert", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-family: "Inter", "Roobert", sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-main);
             margin: 0;
@@ -39,7 +40,6 @@
             margin-bottom: 30px;
         }
 
-        /* 搜尋區塊 */
         .search-container {
             position: sticky;
             top: 10px;
@@ -78,17 +78,18 @@
             justify-content: space-between;
             align-items: center;
             border: 1px solid transparent;
-            transition: transform 0.1s;
+            transition: all 0.2s;
         }
 
         .song-item:hover {
             border-color: var(--twitch-purple);
-            transform: translateX(5px);
+            background: #26262c;
         }
 
         .song-info {
             display: flex;
             flex-direction: column;
+            gap: 4px;
         }
 
         .song-title {
@@ -98,9 +99,24 @@
         }
 
         .song-artist {
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+
+        /* 標籤樣式 */
+        .tag-container {
+            display: flex;
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .tag {
+            background: var(--tag-bg);
             color: var(--text-dim);
-            font-size: 0.9rem;
-            margin-top: 4px;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
         }
 
         /* 複製按鈕 */
@@ -113,21 +129,17 @@
             cursor: pointer;
             font-weight: bold;
             font-size: 0.85rem;
-            transition: background 0.2s;
-        }
-
-        .copy-btn:hover {
-            background: var(--twitch-purple-hover);
+            white-space: nowrap;
+            margin-left: 10px;
         }
 
         .copy-btn.success {
             background: #00c853;
         }
 
-        /* 響應式調整 */
         @media (max-width: 600px) {
             .song-item { flex-direction: column; align-items: flex-start; }
-            .copy-btn { width: 100%; margin-top: 12px; }
+            .copy-btn { width: 100%; margin-top: 12px; margin-left: 0; }
         }
     </style>
 </head>
@@ -136,11 +148,11 @@
     <div class="container">
         <header>
             <h1 id="channelTitle">曲目清單</h1>
-            <p id="channelDesc">點擊右側按鈕即可複製點歌指令到聊天室！</p>
+            <p id="channelDesc">點擊按鈕複製點歌指令，搜尋分類標籤也有效喔！</p>
         </header>
 
         <div class="search-container">
-            <input type="text" id="searchInput" placeholder="輸入歌曲名稱、歌手或關鍵字進行搜尋...">
+            <input type="text" id="searchInput" placeholder="搜尋歌曲、歌手、或標籤 (如：動漫)...">
         </div>
 
         <div id="songListContainer" class="song-list">
@@ -152,14 +164,14 @@
            1. 配置抽離 (Config First)
            ========================================= */
         const DEFAULT_CONFIG = {
-            channelName: "我的 Twitch 頻道",
-            requestPrefix: "!sr", // 點歌指令前綴，例如 !sr 或 !点歌
+            channelName: "Pipi Beats",
+            requestPrefix: "!sr", 
             songs: [
                 { title: "碎光 Shattered Light", artist: "User", tags: ["原創"] },
                 { title: "Cruel Angel's Thesis", artist: "高橋洋子", tags: ["動漫", "EVA"] },
                 { title: "アイドル", artist: "YOASOBI", tags: ["J-Pop"] },
                 { title: "First Love", artist: "宇多田ヒカル", tags: ["經典"] },
-                // 這裡可以持續增加曲目...
+                // 這裡繼續新增
             ]
         };
 
@@ -168,7 +180,6 @@
            ========================================= */
         const RuntimeState = {
             allSongs: [...DEFAULT_CONFIG.songs],
-            filteredSongs: [...DEFAULT_CONFIG.songs],
             searchQuery: ""
         };
 
@@ -186,19 +197,24 @@
            ========================================= */
 
         const RenderSystem = {
-            /**
-             * 初始化頁面基本資訊
-             */
             init() {
                 DOM.channelTitle.textContent = `${DEFAULT_CONFIG.channelName} 全曲目清單`;
-                this.renderList(RuntimeState.allSongs);
+                this.render(RuntimeState.allSongs);
             },
 
             /**
-             * 渲染曲目列表
-             * @param {Array} list - 要顯示的歌曲陣列
+             * 渲染標籤的輔助函數
              */
-            renderList(list) {
+            renderTags(tags) {
+                if (!tags || tags.length === 0) return '';
+                return `
+                    <div class="tag-container">
+                        ${tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                    </div>
+                `;
+            },
+
+            render(list) {
                 if (list.length === 0) {
                     DOM.songListContainer.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--text-dim);">找不到符合的歌曲</div>`;
                     return;
@@ -209,9 +225,10 @@
                         <div class="song-info">
                             <span class="song-title">${song.title}</span>
                             <span class="song-artist">${song.artist}</span>
+                            ${this.renderTags(song.tags)} 
                         </div>
-                        <button class="copy-btn" onclick="InteractionSystem.copyCommand('${song.title}')">
-                            複製指令
+                        <button class="copy-btn" onclick="InteractionSystem.copy('${song.title}')">
+                            複製點歌指令
                         </button>
                     </div>
                 `).join('');
@@ -219,52 +236,39 @@
         };
 
         const InteractionSystem = {
-            /**
-             * 處理搜尋邏輯
-             */
             handleSearch(e) {
                 const query = e.target.value.toLowerCase().trim();
-                RuntimeState.searchQuery = query;
+                
+                // 搜尋邏輯：同時檢查 標題、歌手、以及 標籤內容
+                const filtered = RuntimeState.allSongs.filter(song => {
+                    const matchTitle = song.title.toLowerCase().includes(query);
+                    const matchArtist = song.artist.toLowerCase().includes(query);
+                    const matchTags = song.tags && song.tags.some(tag => tag.toLowerCase().includes(query));
+                    return matchTitle || matchArtist || matchTags;
+                });
 
-                RuntimeState.filteredSongs = RuntimeState.allSongs.filter(song => 
-                    song.title.toLowerCase().includes(query) || 
-                    song.artist.toLowerCase().includes(query) ||
-                    (song.tags && song.tags.some(tag => tag.toLowerCase().includes(query)))
-                );
-
-                RenderSystem.renderList(RuntimeState.filteredSongs);
+                RenderSystem.render(filtered);
             },
 
-            /**
-             * 複製點歌指令到剪貼簿
-             * @param {string} songTitle - 歌曲名稱
-             */
-            copyCommand(songTitle) {
-                const fullCommand = `${DEFAULT_CONFIG.requestPrefix} ${songTitle}`;
-                
-                navigator.clipboard.writeText(fullCommand).then(() => {
-                    // 找到觸發的按鈕並顯示成功狀態
+            copy(title) {
+                const command = `${DEFAULT_CONFIG.requestPrefix} ${title}`;
+                navigator.clipboard.writeText(command).then(() => {
                     const btn = event.target;
-                    const originalText = btn.innerText;
+                    const oldText = btn.innerText;
                     btn.innerText = "已複製！";
                     btn.classList.add('success');
-
                     setTimeout(() => {
-                        btn.innerText = originalText;
+                        btn.innerText = oldText;
                         btn.classList.remove('success');
                     }, 1500);
-                }).catch(err => {
-                    console.error('無法複製', err);
                 });
             }
         };
 
         /* =========================================
-           5. 初始化監聽 (Initialize)
+           5. 初始化 (Initialize)
            ========================================= */
-        DOM.searchInput.addEventListener('input', (e) => InteractionSystem.handleSearch(e));
-
-        // 啟動程式
+        DOM.searchInput.addEventListener('input', InteractionSystem.handleSearch);
         RenderSystem.init();
 
     </script>
