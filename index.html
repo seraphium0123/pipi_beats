@@ -67,7 +67,6 @@
             margin-top: 5px;
         }
 
-        /* 搜尋框 */
         .search-wrapper {
             position: sticky;
             top: 10px;
@@ -86,7 +85,6 @@
             transition: var(--transition);
         }
 
-        /* 曲目列表：雙欄排版 */
         .song-list {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -151,7 +149,6 @@
             border: 1px solid rgba(145, 70, 255, 0.2);
         }
 
-        /* 複製按鈕 */
         .copy-btn {
             background: var(--bg-input);
             color: var(--text-main);
@@ -176,7 +173,6 @@
             color: #000;
         }
 
-        /* 手機版單欄 */
         @media (max-width: 768px) {
             .song-list { grid-template-columns: 1fr; }
             body { padding: 10px; }
@@ -188,11 +184,11 @@
     <div class="container">
         <header>
             <h1 id="channelTitle">皮皮音樂台 Pipi Beats</h1>
-            <p class="subtitle">正在讀取曲目庫...</p>
+            <p class="subtitle">正在連線至曲目庫...</p>
         </header>
 
         <div class="search-wrapper">
-            <input type="text" id="searchInput" placeholder="搜尋歌名、歌手...">
+            <input type="text" id="searchInput" placeholder="搜尋歌名、歌手、或分類標籤...">
         </div>
 
         <div id="songListContainer" class="song-list">
@@ -206,7 +202,7 @@
         const DEFAULT_CONFIG = {
             channelName: "皮皮音樂台 Pipi Beats",
             requestPrefix: "!sr",
-            dataSource: "songs.json" // 資料來源抽離
+            dataSource: "songs.json" 
         };
 
         /* =========================================
@@ -233,12 +229,18 @@
 
         const DataLoader = {
             /**
-             * 從外部 JSON 讀取資料
+             * 從外部 JSON 讀取資料 (加強除錯版)
              */
             async load() {
                 try {
-                    const response = await fetch(DEFAULT_CONFIG.dataSource);
-                    if (!response.ok) throw new Error('無法讀取曲目檔');
+                    // 加入快取消除隨機值，防止瀏覽器讀取舊檔案
+                    const fetchUrl = `${DEFAULT_CONFIG.dataSource}?t=${new Date().getTime()}`;
+                    const response = await fetch(fetchUrl);
+                    
+                    if (!response.ok) {
+                        throw new Error(`[HTTP ${response.status}] 找不到 ${DEFAULT_CONFIG.dataSource} 檔案`);
+                    }
+                    
                     const data = await response.json();
                     RuntimeState.allSongs = data;
                     RuntimeState.currentList = data;
@@ -246,8 +248,15 @@
                     DOM.subtitle.textContent = `共 ${data.length} 首曲目，點擊指令複製點歌！`;
                     RenderSystem.render(data);
                 } catch (error) {
-                    console.error(error);
-                    DOM.subtitle.textContent = "曲目讀取失敗，請檢查 songs.json 是否存在。";
+                    console.error("DataLoader Error:", error);
+                    DOM.subtitle.textContent = "曲目讀取失敗";
+                    DOM.songListContainer.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align:center; padding: 40px; color: #ff4e4e; background: #1f1f23; border-radius: 8px;">
+                            <h3 style="margin:0;">發生錯誤</h3>
+                            <p style="color: #adadb8; font-size: 0.9rem;">原因：${error.message}</p>
+                            <button onclick="location.reload()" style="margin-top:10px; padding: 8px 16px; cursor:pointer;">重試</button>
+                        </div>
+                    `;
                 }
             }
         };
@@ -269,7 +278,7 @@
 
             render(list) {
                 if (list.length === 0) {
-                    DOM.songListContainer.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 20px;">無結果</div>`;
+                    DOM.songListContainer.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 20px; color: var(--text-secondary);">無符合結果</div>`;
                     return;
                 }
 
@@ -303,10 +312,11 @@
                 const command = `${DEFAULT_CONFIG.requestPrefix} ${title}`;
                 navigator.clipboard.writeText(command).then(() => {
                     const btn = event.target;
+                    const oldText = btn.innerText;
                     btn.innerText = "OK!";
                     btn.classList.add('success');
                     setTimeout(() => {
-                        btn.innerText = "!sr";
+                        btn.innerText = oldText;
                         btn.classList.remove('success');
                     }, 1000);
                 });
