@@ -1,10 +1,11 @@
 [
-    { "title": "碎光 Shattered Light", "artist": "User", "tags": ["原創"] },
-    { "title": "Cruel Angel's Thesis", "artist": "高橋洋子", "tags": ["動漫"] },
-    { "title": "アイドル", "artist": "YOASOBI", "tags": ["J-Pop"] },
-    { "title": "First Love", "artist": "宇多田ヒカル", "tags": ["經典"] },
-    { "title": "夜に駆ける", "artist": "YOASOBI", "tags": ["J-Pop"] },
-    { "title": "Lemon", "artist": "米津玄師", "tags": ["日劇"] },
-    { "title": "殘響散歌", "artist": "Aimer", "tags": ["鬼滅"] },
-    { "title": "紅蓮華", "artist": "LiSA", "tags": ["鬼滅"] }
+    { "title": "在風裡奔跑的名字", "artist": "皮皮", "tags": ["皮皮原創","J-Pop"] },
+    { "title": "靠近你的節奏", "artist": "皮皮", "tags": ["皮皮原創","J-Pop"] },
+    { "title": "奔向光的那一刻", "artist": "皮皮", "tags": ["皮皮原創","J-Pop"] },
+    { "title": "校園淡影", "artist": "皮皮", "tags": ["皮皮原創","J-Pop""] },
+    { "title": "訊號同步", "artist": "皮皮", "tags": ["皮皮原創","J-Pop"] },
+    { "title": "追光的瞬間", "artist": "皮皮", "tags": ["皮皮原創","J-Pop"] },
+    { "title": "傾聽的距離", "artist": "皮皮", "tags": ["皮皮原創","J-Pop"] },
+    { "title": "想大聲說出來", "artist": "皮皮", "tags": ["皮皮原創","J-Pop"] }.
+    { "title": "影中之心", "artist": "皮皮", "tags": ["皮皮原創","J-Pop"] }
 ]
