@@ -45,10 +45,12 @@
     { "title": "熱量是幸福的單位(J-POP)", "artist": "皮皮", "tags": ["皮皮原創","J-Pop","NEW"] },
     { "title": "屬於我的假日狂歡(J-POP)", "artist": "皮皮", "tags": ["皮皮原創","J-Pop","NEW"] },
     { "title": "今晚的妳如此亮眼", "artist": "皮皮", "tags": ["皮皮原創","City-Pop","搞怪","NEW"] },
-    { "title": "我們都是大豆", "artist": "貓貓文", "tags": ["皮皮原創","Chill","R&B","NEW"] },
+    { "title": "我們都是大豆", "artist": "貓貓文", "tags": ["貓貓文原創","Chill","R&B","NEW"] },
     { "title": "在愛情中變成柏拉圖", "artist": "皮皮", "tags": ["皮皮原創","J-Pop","搞怪","NEW"] },
     { "title": "變成風吹向天空", "artist": "皮皮", "tags": ["皮皮原創","J-Pop","NEW"] },
     { "title": "直到青春盡頭", "artist": "皮皮", "tags": ["皮皮原創","J-Pop","NEW"] },
     { "title": "Who doesn't care", "artist": "皮皮", "tags": ["皮皮原創","J-Pop","NEW"] },
-    { "title": "特效比旋律更耀眼", "artist": "貓貓文", "tags": ["皮皮原創","J-Pop","Denpa","NEW"] }
+    { "title": "特效比旋律更耀眼", "artist": "貓貓文", "tags": ["貓貓文原創","J-Pop","Denpa","NEW"] },
+    { "title": "公園的小女孩", "artist": "貓貓文", "tags": ["貓貓文原創","J-Pop","Denpa","NEW"] },
+    { "title": "古風之心(粵語)", "artist": "皮皮", "tags": ["皮皮原創","古風","粵語","NEW"] }
 ]
