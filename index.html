@@ -188,7 +188,7 @@
         </header>
 
         <div class="search-wrapper">
-            <input type="text" id="searchInput" placeholder="搜尋歌名、歌手、或分類標籤...">
+            <input type="text" id="searchInput" placeholder="搜尋歌名、歌手、曲風、情緒或情境...">
         </div>
 
         <div id="songListContainer" class="song-list">
@@ -282,18 +282,30 @@
                     return;
                 }
 
-                DOM.songListContainer.innerHTML = list.map(song => `
-                    <div class="song-item">
+                DOM.songListContainer.innerHTML = list.map(song => {
+                    // 彙整新版 JSON 的多維度標籤以供顯示，並去除重複值
+                    const displayTags = [...new Set([
+                        ...(song.tags || []),
+                        ...(song.genre || []),
+                        ...(song.mood || [])
+                    ])];
+
+                    // 處理單引號避免 onclick 語法錯誤 (如 Who doesn't care)
+                    const safeTitle = song.title.replace(/'/g, "\\'");
+
+                    return `
+                    <div class="song-item" title="${song.description || '由皮皮音樂台為您推薦'}">
                         <div class="song-info">
                             <span class="song-title" title="${song.title}">${song.title}</span>
                             <span class="song-artist" title="${song.artist}">${song.artist}</span>
-                            ${this.createTags(song.tags)}
+                            ${this.createTags(displayTags)}
                         </div>
-                        <button class="copy-btn" onclick="InteractionSystem.copy('${song.title}')">
+                        <button class="copy-btn" onclick="InteractionSystem.copy('${safeTitle}')">
                             !sr
                         </button>
                     </div>
-                `).join('');
+                    `;
+                }).join('');
             }
         };
 
@@ -301,9 +313,18 @@
             handleSearch(e) {
                 const term = e.target.value.toLowerCase().trim();
                 RuntimeState.currentList = RuntimeState.allSongs.filter(song => {
-                    return song.title.toLowerCase().includes(term) || 
-                           song.artist.toLowerCase().includes(term) ||
-                           (song.tags && song.tags.some(tag => tag.toLowerCase().includes(term)));
+                    // 將所有可供檢索的維度組合成一個字串進行全域模糊比對
+                    const searchableString = [
+                        song.title,
+                        song.artist,
+                        song.description,
+                        ...(song.tags || []),
+                        ...(song.genre || []),
+                        ...(song.mood || []),
+                        ...(song.scenarios || [])
+                    ].filter(Boolean).join(' ').toLowerCase();
+
+                    return searchableString.includes(term);
                 });
                 RenderSystem.render(RuntimeState.currentList);
             },
