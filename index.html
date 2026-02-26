@@ -113,6 +113,7 @@
             overflow: hidden;
             flex: 1;
             margin-right: 10px;
+            cursor: pointer; /* 新增游標樣式提示可點擊 */
         }
 
         .song-title {
@@ -173,6 +174,73 @@
             color: #000;
         }
 
+        /* 歌詞彈出視窗樣式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75);
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-container);
+            border: var(--border-style);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            padding: 15px 20px;
+            border-bottom: var(--border-style);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: var(--text-accent);
+        }
+
+        .close-btn {
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: var(--text-main);
+        }
+
+        .lyrics-body {
+            padding: 20px;
+            overflow-y: auto;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            line-height: 1.8;
+            white-space: pre-wrap;
+        }
+
         @media (max-width: 768px) {
             .song-list { grid-template-columns: 1fr; }
             body { padding: 10px; }
@@ -188,11 +256,21 @@
         </header>
 
         <div class="search-wrapper">
-            <input type="text" id="searchInput" placeholder="搜尋歌名、歌手、曲風、情緒或情境...">
+            <input type="text" id="searchInput" placeholder="搜尋歌名、歌手、或分類標籤...">
         </div>
 
         <div id="songListContainer" class="song-list">
+        </div>
+    </div>
+
+    <div id="lyricsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">歌名</h2>
+                <span class="close-btn" id="closeModalBtn">&times;</span>
             </div>
+            <div id="lyricsBody" class="lyrics-body"></div>
+        </div>
     </div>
 
     <script>
@@ -220,7 +298,12 @@
             channelTitle: document.getElementById('channelTitle'),
             searchInput: document.getElementById('searchInput'),
             songListContainer: document.getElementById('songListContainer'),
-            subtitle: document.querySelector('.subtitle')
+            subtitle: document.querySelector('.subtitle'),
+            // Modal 快取
+            lyricsModal: document.getElementById('lyricsModal'),
+            modalTitle: document.getElementById('modalTitle'),
+            lyricsBody: document.getElementById('lyricsBody'),
+            closeModalBtn: document.getElementById('closeModalBtn')
         };
 
         /* =========================================
@@ -245,7 +328,7 @@
                     RuntimeState.allSongs = data;
                     RuntimeState.currentList = data;
                     
-                    DOM.subtitle.textContent = `共 ${data.length} 首曲目，點擊指令複製點歌！`;
+                    DOM.subtitle.textContent = `共 ${data.length} 首曲目，點擊歌名看歌詞，點按鈕複製點歌！`;
                     RenderSystem.render(data);
                 } catch (error) {
                     console.error("DataLoader Error:", error);
@@ -282,30 +365,18 @@
                     return;
                 }
 
-                DOM.songListContainer.innerHTML = list.map(song => {
-                    // 彙整新版 JSON 的多維度標籤以供顯示，並去除重複值
-                    const displayTags = [...new Set([
-                        ...(song.tags || []),
-                        ...(song.genre || []),
-                        ...(song.mood || [])
-                    ])];
-
-                    // 處理單引號避免 onclick 語法錯誤 (如 Who doesn't care)
-                    const safeTitle = song.title.replace(/'/g, "\\'");
-
-                    return `
-                    <div class="song-item" title="${song.description || '由皮皮音樂台為您推薦'}">
-                        <div class="song-info">
+                DOM.songListContainer.innerHTML = list.map(song => `
+                    <div class="song-item">
+                        <div class="song-info" onclick="InteractionSystem.openLyrics('${song.id}')">
                             <span class="song-title" title="${song.title}">${song.title}</span>
                             <span class="song-artist" title="${song.artist}">${song.artist}</span>
-                            ${this.createTags(displayTags)}
+                            ${this.createTags(song.tags)}
                         </div>
-                        <button class="copy-btn" onclick="InteractionSystem.copy('${safeTitle}')">
+                        <button class="copy-btn" onclick="InteractionSystem.copy('${song.title}')">
                             !sr
                         </button>
                     </div>
-                    `;
-                }).join('');
+                `).join('');
             }
         };
 
@@ -313,18 +384,9 @@
             handleSearch(e) {
                 const term = e.target.value.toLowerCase().trim();
                 RuntimeState.currentList = RuntimeState.allSongs.filter(song => {
-                    // 將所有可供檢索的維度組合成一個字串進行全域模糊比對
-                    const searchableString = [
-                        song.title,
-                        song.artist,
-                        song.description,
-                        ...(song.tags || []),
-                        ...(song.genre || []),
-                        ...(song.mood || []),
-                        ...(song.scenarios || [])
-                    ].filter(Boolean).join(' ').toLowerCase();
-
-                    return searchableString.includes(term);
+                    return song.title.toLowerCase().includes(term) || 
+                           song.artist.toLowerCase().includes(term) ||
+                           (song.tags && song.tags.some(tag => tag.toLowerCase().includes(term)));
                 });
                 RenderSystem.render(RuntimeState.currentList);
             },
@@ -341,6 +403,26 @@
                         btn.classList.remove('success');
                     }, 1000);
                 });
+            },
+
+            openLyrics(id) {
+                const song = RuntimeState.allSongs.find(s => s.id === id);
+                if (!song) return;
+                
+                DOM.modalTitle.textContent = song.title;
+                
+                let formattedLyrics = "暫無歌詞提供";
+                if (song.lyrics && song.lyrics.length > 0) {
+                    // 將陣列合併，並使用正規表達式移除時間軸 (如 [00:13.71]) 讓閱讀更乾淨
+                    formattedLyrics = song.lyrics.map(line => line.replace(/\[\d{2}:\d{2}\.\d{2}\]/g, '').trim()).join('\n');
+                }
+                
+                DOM.lyricsBody.textContent = formattedLyrics;
+                DOM.lyricsModal.classList.add('active');
+            },
+
+            closeLyrics() {
+                DOM.lyricsModal.classList.remove('active');
             }
         };
 
@@ -348,6 +430,17 @@
            5. 初始化監聽 (Initialize)
            ========================================= */
         DOM.searchInput.addEventListener('input', (e) => InteractionSystem.handleSearch(e));
+        
+        // 點擊右上角 X 關閉歌詞
+        DOM.closeModalBtn.addEventListener('click', () => InteractionSystem.closeLyrics());
+        
+        // 點擊 Modal 外部半透明背景關閉歌詞
+        DOM.lyricsModal.addEventListener('click', (e) => {
+            if (e.target === DOM.lyricsModal) {
+                InteractionSystem.closeLyrics();
+            }
+        });
+
         RenderSystem.init();
 
     </script>
