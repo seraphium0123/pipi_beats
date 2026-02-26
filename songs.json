@@ -944,5 +944,27 @@
     "scenarios": ["辦公室背景音", "開工喝咖啡", "收心"],
     "tags": ["皮皮原創", "Bossa Nova", "NEW"],
     "description": "用慵懶輕鬆的 Bossa Nova 節奏沖淡開工的憂鬱，配上一杯咖啡，為新的一年迎來好心情。"
+  },
+  {
+    "id": "track_087",
+    "title": "妹妹揹著洋娃娃 (華語老歌版)",
+    "artist": "皮皮",
+    "language": "華語",
+    "genre": ["1980s Taiwan Pop", "Enka Ballad", "Kayokyoku"],
+    "mood": ["懷舊", "悲傷", "懸疑", "淒美"],
+    "scenarios": ["深夜獨處", "情緒沉澱", "故事配樂"],
+    "tags": ["皮皮原創", "演歌", "男低音", "NEW"],
+    "description": "以 1980 年代流行演歌為基底，深沉的男低音結合薩克斯風與竹笛的幽怨交織，將耳熟能詳的童謠化作一段如夢似幻、淒美又帶點懸疑的失落故事。"
+  },
+  {
+    "id": "track_088",
+    "title": "City Lights",
+    "artist": "皮皮",
+    "language": "英文",
+    "genre": ["K-Pop", "EDM Pop", "Dance Pop"],
+    "mood": ["自信", "強勢", "充滿活力", "燃向"],
+    "scenarios": ["運動健身", "派對舞池", "開車兜風", "提神醒腦"],
+    "tags": ["皮皮原創", "Girl Crush", "Heavy Bass", "NEW"],
+    "description": "強烈自信的 Girl Crush 曲風！以重低音 Trap 節拍結合極具侵略性的合成器銅管，搭配充滿爆發力的女聲，展現出駕馭城市夜晚、無所畏懼的女王氣場。"
   }
 ]
