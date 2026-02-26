@@ -328,7 +328,6 @@
                     RuntimeState.allSongs = data;
                     RuntimeState.currentList = data;
                     
-                    DOM.subtitle.textContent = `共 ${data.length} 首曲目，點擊歌名看歌詞，點按鈕複製點歌！`;
                     RenderSystem.render(data);
                 } catch (error) {
                     console.error("DataLoader Error:", error);
@@ -360,6 +359,9 @@
             },
 
             render(list) {
+                // 動態更新副標題的曲目數量
+                DOM.subtitle.textContent = `共 ${list.length} 首曲目，點擊歌名看歌詞，點按鈕複製點歌！`;
+
                 if (list.length === 0) {
                     DOM.songListContainer.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 20px; color: var(--text-secondary);">無符合結果</div>`;
                     return;
