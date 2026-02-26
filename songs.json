@@ -767,18 +767,20 @@
     "artist": "皮皮",
     "language": "華語",
     "genre": [
-      "Lazy",
       "J-Pop",
       "Electronica",
       "Alternative R&B",
-      "Synth-pop"
+      "Synth-pop",
+      "Lazy"
     ],
     "mood": [
+      "Bittersweet",
+      "Nostalgic",
+      "Modern",
+      "Melancholic",
       "輕柔",
       "微憂鬱",
-      "靜謐",
-      "Bittersweet",
-      "Nostalgic"
+      "靜謐"
     ],
     "scenarios": [
       "雨天獨處",
@@ -793,7 +795,7 @@
       "距離美",
       "NEW"
     ],
-    "description": "融合電子與 R&B 律動的慵懶之作。以深邃的合成器低音與 Glitchy beats 營造出都會疏離感。歌詞細膩描寫與一隻相處三年的傲嬌貓咪之間『近在咫尺卻隔著星系』的微妙關係，將無法觸碰的遺憾昇華為一種互相尊重的自由羈絆。",
+    "description": "融合電子與 R&B 律動的慵懶之作。採用低沉沙啞的女中音 (Female Alto) 以 Crooner 唱腔詮釋。編曲以深邃的合成器低音 (Deep Synth Bass) 與類比合成器為底，搭配帶有顆粒感且斷續的 Glitchy beats 營造都會疏離感，並點綴些許靜謐鋼琴。歌詞細膩描寫與傲嬌貓咪之間『近在咫尺卻隔著星系』的微妙關係，將遺憾昇華為彼此尊重的自由羈絆。",
     "lyrics": [
       "[00:17.96]自動門打開的聲音我知道你就在那裡",
       "[00:24.00]三年的默契不用說明像設定好的程式邏輯",
