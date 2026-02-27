@@ -25,6 +25,15 @@
             --tag-genre-bg: rgba(0, 245, 147, 0.1);
             --tag-genre-border: rgba(0, 245, 147, 0.3);
             --tag-genre-text: #00f593;
+            
+            /* BPM 標籤色彩 - 暗色主題 */
+            --bpm-slow-bg: rgba(52, 152, 219, 0.15);
+            --bpm-slow-text: #5dade2;
+            --bpm-medium-bg: rgba(241, 196, 15, 0.15);
+            --bpm-medium-text: #f4d03f;
+            --bpm-fast-bg: rgba(231, 76, 60, 0.15);
+            --bpm-fast-text: #ec7063;
+
             --modal-overlay: rgba(0, 0, 0, 0.75);
             --transition: all 0.2s ease;
         }
@@ -44,6 +53,15 @@
             --tag-genre-bg: rgba(0, 138, 82, 0.1);
             --tag-genre-border: rgba(0, 138, 82, 0.3);
             --tag-genre-text: #008a52;
+            
+            /* BPM 標籤色彩 - 亮色主題 */
+            --bpm-slow-bg: rgba(41, 128, 185, 0.15);
+            --bpm-slow-text: #2980b9;
+            --bpm-medium-bg: rgba(212, 172, 13, 0.15);
+            --bpm-medium-text: #d4ac0d;
+            --bpm-fast-bg: rgba(192, 57, 43, 0.15);
+            --bpm-fast-text: #c0392b;
+
             --modal-overlay: rgba(0, 0, 0, 0.5);
         }
 
@@ -239,6 +257,25 @@
             border-color: var(--tag-genre-border);
         }
 
+        /* BPM 標籤特殊樣式 */
+        .bpm-slow {
+            background: var(--bpm-slow-bg);
+            color: var(--bpm-slow-text);
+            border-color: var(--bpm-slow-bg);
+        }
+
+        .bpm-medium {
+            background: var(--bpm-medium-bg);
+            color: var(--bpm-medium-text);
+            border-color: var(--bpm-medium-bg);
+        }
+
+        .bpm-fast {
+            background: var(--bpm-fast-bg);
+            color: var(--bpm-fast-text);
+            border-color: var(--bpm-fast-bg);
+        }
+
         /* NEW 標籤特殊樣式 */
         .new-tag {
             background: linear-gradient(45deg, #ff4e4e, #ffaa00);
@@ -395,7 +432,11 @@
             channelName: "皮皮音樂台 Pipi Beats",
             requestPrefix: "!sr",
             dataSource: "songs.json",
-            themePrefKey: "pipi_theme_preference" // 持久化主題的 Key
+            themePrefKey: "pipi_theme_preference", // 持久化主題的 Key
+            bpmThresholds: {
+                slow: 100, // 小於 100 視為慢板
+                fast: 130  // 大於等於 130 視為快板，中間視為中板
+            }
         };
 
         /* =========================================
@@ -477,7 +518,26 @@
             createTags(song) {
                 let tagsHtml = '';
 
-                // 1. 優先處理 main_genre 與 sub_genre (顯示為專屬曲風標籤)
+                // 1. 優先處理 BPM (速度標籤)
+                if (song.bpm) {
+                    const bpmValue = parseInt(song.bpm, 10);
+                    if (!isNaN(bpmValue)) {
+                        let bpmClass = 'bpm-medium';
+                        let bpmLabel = '中';
+                        
+                        if (bpmValue < DEFAULT_CONFIG.bpmThresholds.slow) {
+                            bpmClass = 'bpm-slow';
+                            bpmLabel = '慢';
+                        } else if (bpmValue >= DEFAULT_CONFIG.bpmThresholds.fast) {
+                            bpmClass = 'bpm-fast';
+                            bpmLabel = '快';
+                        }
+                        
+                        tagsHtml += `<span class="tag ${bpmClass}" title="BPM: ${song.bpm}">BPM ${song.bpm} (${bpmLabel})</span>`;
+                    }
+                }
+
+                // 2. 處理 main_genre 與 sub_genre (顯示為專屬曲風標籤)
                 if (song.main_genre) {
                     tagsHtml += `<span class="tag genre-tag">${song.main_genre}</span>`;
                 }
@@ -485,7 +545,7 @@
                     tagsHtml += `<span class="tag genre-tag">${song.sub_genre}</span>`;
                 }
 
-                // 2. 處理原有的 tags 陣列
+                // 3. 處理原有的 tags 陣列
                 if (song.tags && song.tags.length > 0) {
                     song.tags.forEach(tag => {
                         // 若標籤為 NEW，套用特殊高光樣式
@@ -572,8 +632,9 @@
                     const matchTags = song.tags && song.tags.some(tag => tag.toLowerCase().includes(term));
                     const matchMainGenre = song.main_genre && song.main_genre.toLowerCase().includes(term);
                     const matchSubGenre = song.sub_genre && song.sub_genre.toLowerCase().includes(term);
+                    const matchBpm = song.bpm && song.bpm.toString().includes(term);
                     
-                    return matchTitle || matchArtist || matchTags || matchMainGenre || matchSubGenre;
+                    return matchTitle || matchArtist || matchTags || matchMainGenre || matchSubGenre || matchBpm;
                 });
                 RenderSystem.render(RuntimeState.currentList);
             },
