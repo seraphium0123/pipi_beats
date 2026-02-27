@@ -34,8 +34,12 @@
             --bpm-fast-bg: rgba(231, 76, 60, 0.15);
             --bpm-fast-text: #ec7063;
 
+            /* 懸浮效果陰影 - 暗色主題使用較深、較不透明的陰影 */
+            --hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+
             --modal-overlay: rgba(0, 0, 0, 0.75);
-            --transition: all 0.2s ease;
+            /* 將動畫過渡稍微放慢，讓浮動效果更滑順 */
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
         /* 亮色主題切換 */
@@ -61,6 +65,9 @@
             --bpm-medium-text: #d4ac0d;
             --bpm-fast-bg: rgba(192, 57, 43, 0.15);
             --bpm-fast-text: #c0392b;
+
+            /* 懸浮效果陰影 - 亮色主題使用輕柔的透明陰影 */
+            --hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 
             --modal-overlay: rgba(0, 0, 0, 0.5);
         }
@@ -157,12 +164,13 @@
         #searchInput:focus {
             outline: none;
             border-color: var(--twitch-purple);
+            box-shadow: 0 0 0 3px rgba(145, 70, 255, 0.2);
         }
 
         .song-list {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            gap: 12px; /* 稍微增加間距讓浮動不擁擠 */
         }
 
         .song-item {
@@ -174,11 +182,17 @@
             align-items: center;
             border: var(--border-style);
             transition: var(--transition);
+            position: relative;
+            z-index: 1;
         }
 
+        /* 現代感互動：懸浮特效 */
         .song-item:hover {
             border-color: var(--twitch-purple);
             background: var(--bg-card);
+            transform: translateY(-5px); /* 向上浮動 5px */
+            box-shadow: var(--hover-shadow); /* 套用動態陰影 */
+            z-index: 2; /* 浮動時層級提高，避免被其他卡片遮擋 */
         }
 
         .song-info {
@@ -317,6 +331,7 @@
         .copy-btn:hover {
             background: var(--twitch-purple);
             color: white;
+            transform: scale(1.02); /* 按鈕稍微放大 */
         }
 
         .copy-btn.success {
@@ -354,7 +369,7 @@
             max-height: 80vh;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
 
         .modal-header {
@@ -397,6 +412,7 @@
             .song-list { grid-template-columns: 1fr; }
             body { padding: 10px; }
             .theme-toggle-btn { top: 10px; }
+            .song-item:hover { transform: translateY(-2px); } /* 行動版浮動幅度減小 */
         }
     </style>
 </head>
