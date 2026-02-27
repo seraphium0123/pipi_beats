@@ -10,6 +10,7 @@
            CSS 負責樣式 (Standardized Styles)
            ========================================= */
         :root {
+            /* 暗色主題 (預設) */
             --primary-gradient: linear-gradient(135deg, #9146ff 0%, #6441a5 100%);
             --twitch-purple: #9146ff;
             --success-green: #00f593;
@@ -21,7 +22,29 @@
             --text-secondary: #adadb8;
             --text-accent: #bf94ff;
             --border-style: 1px solid #303032;
+            --tag-genre-bg: rgba(0, 245, 147, 0.1);
+            --tag-genre-border: rgba(0, 245, 147, 0.3);
+            --tag-genre-text: #00f593;
+            --modal-overlay: rgba(0, 0, 0, 0.75);
             --transition: all 0.2s ease;
+        }
+
+        /* 亮色主題切換 */
+        :root.theme-light {
+            --twitch-purple: #772ce8;
+            --success-green: #008a52;
+            --bg-body: #f0f0f4;
+            --bg-container: #ffffff;
+            --bg-card: #f9f9fb;
+            --bg-input: #ffffff;
+            --text-main: #18181b;
+            --text-secondary: #53535f;
+            --text-accent: #6441a5;
+            --border-style: 1px solid #e5e5e5;
+            --tag-genre-bg: rgba(0, 138, 82, 0.1);
+            --tag-genre-border: rgba(0, 138, 82, 0.3);
+            --tag-genre-text: #008a52;
+            --modal-overlay: rgba(0, 0, 0, 0.5);
         }
 
         * { box-sizing: border-box; }
@@ -34,12 +57,14 @@
             padding: 20px;
             display: flex;
             justify-content: center;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .container {
             width: 100%;
             max-width: 1000px;
             animation: fadeIn 0.5s ease-out;
+            position: relative;
         }
 
         @keyframes fadeIn {
@@ -50,6 +75,31 @@
         header {
             text-align: center;
             margin-bottom: 20px;
+            position: relative;
+        }
+
+        .theme-toggle-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--bg-container);
+            border: var(--border-style);
+            color: var(--text-main);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .theme-toggle-btn:hover {
+            border-color: var(--twitch-purple);
+            transform: scale(1.05);
         }
 
         h1 {
@@ -72,48 +122,23 @@
             top: 10px;
             z-index: 1000;
             margin-bottom: 20px;
-            background: var(--bg-body); /* 滾動時確保背景不透明 */
-            padding-bottom: 10px;
         }
 
         #searchInput {
             width: 100%;
             padding: 12px 20px;
             border-radius: 8px;
-            border: 2px solid #303032;
+            border: 2px solid var(--text-secondary);
+            border-color: var(--border-style);
             background: var(--bg-input);
             color: var(--text-main);
             font-size: 1.1rem;
             transition: var(--transition);
         }
         
-        /* 搜尋選項樣式 */
-        .search-options {
-            margin-top: 8px;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-        }
-
-        .toggle-label {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            transition: var(--transition);
-        }
-
-        .toggle-label:hover {
-            color: var(--text-main);
-        }
-
-        .toggle-label input[type="checkbox"] {
-            margin-right: 8px;
-            accent-color: var(--twitch-purple);
-            cursor: pointer;
-            width: 16px;
-            height: 16px;
+        #searchInput:focus {
+            outline: none;
+            border-color: var(--twitch-purple);
         }
 
         .song-list {
@@ -144,7 +169,13 @@
             overflow: hidden;
             flex: 1;
             margin-right: 10px;
-            cursor: pointer;
+            cursor: pointer; 
+        }
+
+        .song-title-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .song-title {
@@ -156,6 +187,25 @@
             text-overflow: ellipsis;
         }
 
+        .info-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 4px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .info-btn:hover {
+            color: var(--twitch-purple);
+            background: rgba(145, 70, 255, 0.1);
+        }
+
         .song-artist {
             color: var(--text-main);
             font-size: 0.85rem;
@@ -163,12 +213,13 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            margin-top: 2px;
         }
 
         .tag-group {
             display: flex;
             gap: 4px;
-            margin-top: 4px;
+            margin-top: 6px;
             flex-wrap: wrap;
         }
 
@@ -179,6 +230,23 @@
             padding: 1px 6px;
             border-radius: 4px;
             border: 1px solid rgba(145, 70, 255, 0.2);
+        }
+
+        /* 曲風標籤特殊樣式 */
+        .genre-tag {
+            background: var(--tag-genre-bg);
+            color: var(--tag-genre-text);
+            border-color: var(--tag-genre-border);
+        }
+
+        /* NEW 標籤特殊樣式 */
+        .new-tag {
+            background: linear-gradient(45deg, #ff4e4e, #ffaa00);
+            color: #fff;
+            border: none;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 4px rgba(255, 78, 78, 0.3);
         }
 
         .copy-btn {
@@ -205,7 +273,7 @@
             color: #000;
         }
 
-        /* 歌詞彈出視窗樣式 */
+        /* 共用彈出視窗樣式 */
         .modal {
             display: none;
             position: fixed;
@@ -214,10 +282,11 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.75);
+            background-color: var(--modal-overlay);
             align-items: center;
             justify-content: center;
             animation: fadeIn 0.2s ease-out;
+            backdrop-filter: blur(2px);
         }
 
         .modal.active {
@@ -263,7 +332,7 @@
             color: var(--text-main);
         }
 
-        .lyrics-body {
+        .modal-body {
             padding: 20px;
             overflow-y: auto;
             color: var(--text-main);
@@ -275,6 +344,7 @@
         @media (max-width: 768px) {
             .song-list { grid-template-columns: 1fr; }
             body { padding: 10px; }
+            .theme-toggle-btn { top: 10px; }
         }
     </style>
 </head>
@@ -284,29 +354,36 @@
         <header>
             <h1 id="channelTitle">皮皮音樂台 Pipi Beats</h1>
             <p class="subtitle">正在連線至曲目庫...</p>
+            <button id="themeToggleBtn" class="theme-toggle-btn" title="切換深/淺色主題">🌞</button>
         </header>
 
         <div class="search-wrapper">
             <input type="text" id="searchInput" placeholder="搜尋歌名、歌手、或分類標籤...">
-            <div class="search-options">
-                <label class="toggle-label">
-                    <input type="checkbox" id="lyricsSearchToggle">
-                    <span class="toggle-text">包含歌詞模糊檢索</span>
-                </label>
-            </div>
         </div>
 
         <div id="songListContainer" class="song-list">
         </div>
     </div>
 
+    <!-- 歌詞 Modal -->
     <div id="lyricsModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="modalTitle">歌名</h2>
                 <span class="close-btn" id="closeModalBtn">&times;</span>
             </div>
-            <div id="lyricsBody" class="lyrics-body"></div>
+            <div id="lyricsBody" class="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- 介紹 Modal -->
+    <div id="descModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="descModalTitle">曲目介紹</h2>
+                <span class="close-btn" id="closeDescModalBtn">&times;</span>
+            </div>
+            <div id="descBody" class="modal-body"></div>
         </div>
     </div>
 
@@ -317,7 +394,8 @@
         const DEFAULT_CONFIG = {
             channelName: "皮皮音樂台 Pipi Beats",
             requestPrefix: "!sr",
-            dataSource: "songs.json" 
+            dataSource: "songs.json",
+            themePrefKey: "pipi_theme_preference" // 持久化主題的 Key
         };
 
         /* =========================================
@@ -325,7 +403,8 @@
            ========================================= */
         const RuntimeState = {
             allSongs: [],
-            currentList: []
+            currentList: [],
+            isDarkMode: true // 預設深色
         };
 
         /* =========================================
@@ -334,14 +413,21 @@
         const DOM = {
             channelTitle: document.getElementById('channelTitle'),
             searchInput: document.getElementById('searchInput'),
-            lyricsSearchToggle: document.getElementById('lyricsSearchToggle'),
             songListContainer: document.getElementById('songListContainer'),
             subtitle: document.querySelector('.subtitle'),
-            // Modal 快取
+            themeToggleBtn: document.getElementById('themeToggleBtn'),
+            
+            // 歌詞 Modal 快取
             lyricsModal: document.getElementById('lyricsModal'),
             modalTitle: document.getElementById('modalTitle'),
             lyricsBody: document.getElementById('lyricsBody'),
-            closeModalBtn: document.getElementById('closeModalBtn')
+            closeModalBtn: document.getElementById('closeModalBtn'),
+
+            // 介紹 Modal 快取
+            descModal: document.getElementById('descModal'),
+            descModalTitle: document.getElementById('descModalTitle'),
+            descBody: document.getElementById('descBody'),
+            closeDescModalBtn: document.getElementById('closeDescModalBtn')
         };
 
         /* =========================================
@@ -371,9 +457,9 @@
                     console.error("DataLoader Error:", error);
                     DOM.subtitle.textContent = "曲目讀取失敗";
                     DOM.songListContainer.innerHTML = `
-                        <div style="grid-column: 1/-1; text-align:center; padding: 40px; color: #ff4e4e; background: #1f1f23; border-radius: 8px;">
+                        <div style="grid-column: 1/-1; text-align:center; padding: 40px; color: #ff4e4e; background: var(--bg-card); border-radius: 8px;">
                             <h3 style="margin:0;">發生錯誤</h3>
-                            <p style="color: #adadb8; font-size: 0.9rem;">原因：${error.message}</p>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem;">原因：${error.message}</p>
                             <button onclick="location.reload()" style="margin-top:10px; padding: 8px 16px; cursor:pointer;">重試</button>
                         </div>
                     `;
@@ -383,15 +469,39 @@
 
         const RenderSystem = {
             init() {
+                InteractionSystem.initTheme(); // 初始化主題
                 DOM.channelTitle.textContent = DEFAULT_CONFIG.channelName;
                 DataLoader.load();
             },
 
-            createTags(tags) {
-                if (!tags || tags.length === 0) return '';
+            createTags(song) {
+                let tagsHtml = '';
+
+                // 1. 優先處理 main_genre 與 sub_genre (顯示為專屬曲風標籤)
+                if (song.main_genre) {
+                    tagsHtml += `<span class="tag genre-tag">${song.main_genre}</span>`;
+                }
+                if (song.sub_genre) {
+                    tagsHtml += `<span class="tag genre-tag">${song.sub_genre}</span>`;
+                }
+
+                // 2. 處理原有的 tags 陣列
+                if (song.tags && song.tags.length > 0) {
+                    song.tags.forEach(tag => {
+                        // 若標籤為 NEW，套用特殊高光樣式
+                        if (tag.toUpperCase() === 'NEW') {
+                            tagsHtml += `<span class="tag new-tag">${tag}</span>`;
+                        } else {
+                            tagsHtml += `<span class="tag">${tag}</span>`;
+                        }
+                    });
+                }
+
+                if (!tagsHtml) return '';
+                
                 return `
                     <div class="tag-group">
-                        ${tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                        ${tagsHtml}
                     </div>
                 `;
             },
@@ -408,9 +518,14 @@
                 DOM.songListContainer.innerHTML = list.map(song => `
                     <div class="song-item">
                         <div class="song-info" onclick="InteractionSystem.openLyrics('${song.id}')">
-                            <span class="song-title" title="${song.title}">${song.title}</span>
+                            <div class="song-title-row">
+                                <span class="song-title" title="${song.title}">${song.title}</span>
+                                <button class="info-btn" title="查看曲目介紹" onclick="event.stopPropagation(); InteractionSystem.openDescription('${song.id}')">
+                                    ℹ️
+                                </button>
+                            </div>
                             <span class="song-artist" title="${song.artist}">${song.artist}</span>
-                            ${this.createTags(song.tags)}
+                            ${this.createTags(song)}
                         </div>
                         <button class="copy-btn" onclick="InteractionSystem.copy('${song.title}')">
                             !sr
@@ -421,43 +536,51 @@
         };
 
         const InteractionSystem = {
-            /**
-             * 處理搜尋邏輯，依據開關決定是否進行歌詞模糊檢索
-             */
-            handleSearch() {
-                const term = DOM.searchInput.value.toLowerCase().trim();
-                const includeLyrics = DOM.lyricsSearchToggle.checked;
-                
-                if (!term) {
-                    RuntimeState.currentList = RuntimeState.allSongs;
+            // 主題初始化
+            initTheme() {
+                const savedTheme = localStorage.getItem(DEFAULT_CONFIG.themePrefKey);
+                if (savedTheme === 'light') {
+                    RuntimeState.isDarkMode = false;
+                    document.documentElement.classList.add('theme-light');
+                    DOM.themeToggleBtn.textContent = '🌙';
                 } else {
-                    RuntimeState.currentList = RuntimeState.allSongs.filter(song => {
-                        // 1. 標題與歌手比對
-                        const basicMatch = song.title.toLowerCase().includes(term) || 
-                                          song.artist.toLowerCase().includes(term);
-                        
-                        // 2. 標籤比對
-                        const tagMatch = song.tags && song.tags.some(tag => tag.toLowerCase().includes(term));
-                        
-                        // 3. 歌詞模糊檢索 (若啟用)
-                        let lyricsMatch = false;
-                        if (includeLyrics) {
-                            const lyricsText = song.lyrics ? song.lyrics.join(' ').toLowerCase() : '';
-                            lyricsMatch = lyricsText.includes(term);
-                        }
-                        
-                        return basicMatch || tagMatch || lyricsMatch;
-                    });
+                    RuntimeState.isDarkMode = true;
+                    document.documentElement.classList.remove('theme-light');
+                    DOM.themeToggleBtn.textContent = '🌞';
                 }
-                
+            },
+
+            // 切換深/淺色主題
+            toggleTheme() {
+                RuntimeState.isDarkMode = !RuntimeState.isDarkMode;
+                if (RuntimeState.isDarkMode) {
+                    document.documentElement.classList.remove('theme-light');
+                    DOM.themeToggleBtn.textContent = '🌞';
+                    localStorage.setItem(DEFAULT_CONFIG.themePrefKey, 'dark');
+                } else {
+                    document.documentElement.classList.add('theme-light');
+                    DOM.themeToggleBtn.textContent = '🌙';
+                    localStorage.setItem(DEFAULT_CONFIG.themePrefKey, 'light');
+                }
+            },
+
+            handleSearch(e) {
+                const term = e.target.value.toLowerCase().trim();
+                RuntimeState.currentList = RuntimeState.allSongs.filter(song => {
+                    const matchTitle = song.title.toLowerCase().includes(term);
+                    const matchArtist = song.artist.toLowerCase().includes(term);
+                    const matchTags = song.tags && song.tags.some(tag => tag.toLowerCase().includes(term));
+                    const matchMainGenre = song.main_genre && song.main_genre.toLowerCase().includes(term);
+                    const matchSubGenre = song.sub_genre && song.sub_genre.toLowerCase().includes(term);
+                    
+                    return matchTitle || matchArtist || matchTags || matchMainGenre || matchSubGenre;
+                });
                 RenderSystem.render(RuntimeState.currentList);
             },
 
             copy(title) {
                 const command = `${DEFAULT_CONFIG.requestPrefix} ${title}`;
                 navigator.clipboard.writeText(command).then(() => {
-                    // 若沒有事件對象 (如被程式呼叫)，則直接略過按鈕特效
-                    if (!event || !event.target) return;
                     const btn = event.target;
                     const oldText = btn.innerText;
                     btn.innerText = "OK!";
@@ -469,6 +592,7 @@
                 });
             },
 
+            // 歌詞 Modal 邏輯
             openLyrics(id) {
                 const song = RuntimeState.allSongs.find(s => s.id === id);
                 if (!song) return;
@@ -487,28 +611,46 @@
 
             closeLyrics() {
                 DOM.lyricsModal.classList.remove('active');
+            },
+
+            // 介紹 Modal 邏輯
+            openDescription(id) {
+                const song = RuntimeState.allSongs.find(s => s.id === id);
+                if (!song) return;
+                
+                DOM.descModalTitle.textContent = `[介紹] ${song.title}`;
+                DOM.descBody.textContent = song.description || "這首曲目暫無詳細介紹。";
+                DOM.descModal.classList.add('active');
+            },
+
+            closeDescription() {
+                DOM.descModal.classList.remove('active');
             }
         };
 
         /* =========================================
            5. 初始化監聽 (Initialize)
            ========================================= */
-        // 監聽文字輸入
-        DOM.searchInput.addEventListener('input', () => InteractionSystem.handleSearch());
         
-        // 監聽勾選框狀態改變 (勾選或取消時立即重新搜尋)
-        DOM.lyricsSearchToggle.addEventListener('change', () => InteractionSystem.handleSearch());
+        // 主題切換監聽
+        DOM.themeToggleBtn.addEventListener('click', () => InteractionSystem.toggleTheme());
+
+        // 搜尋監聽
+        DOM.searchInput.addEventListener('input', (e) => InteractionSystem.handleSearch(e));
         
-        // 點擊右上角 X 關閉歌詞
+        // 歌詞 Modal 監聽
         DOM.closeModalBtn.addEventListener('click', () => InteractionSystem.closeLyrics());
-        
-        // 點擊 Modal 外部半透明背景關閉歌詞
         DOM.lyricsModal.addEventListener('click', (e) => {
-            if (e.target === DOM.lyricsModal) {
-                InteractionSystem.closeLyrics();
-            }
+            if (e.target === DOM.lyricsModal) InteractionSystem.closeLyrics();
         });
 
+        // 介紹 Modal 監聽
+        DOM.closeDescModalBtn.addEventListener('click', () => InteractionSystem.closeDescription());
+        DOM.descModal.addEventListener('click', (e) => {
+            if (e.target === DOM.descModal) InteractionSystem.closeDescription();
+        });
+
+        // 啟動系統
         RenderSystem.init();
 
     </script>
