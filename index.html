@@ -83,6 +83,7 @@
             display: flex;
             justify-content: center;
             transition: background-color 0.3s ease, color 0.3s ease;
+            overflow-x: hidden; /* 防止極端情況下的水平滾動 */
         }
 
         .container {
@@ -170,7 +171,7 @@
         .song-list {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px; /* 稍微增加間距讓浮動不擁擠 */
+            gap: 12px;
         }
 
         .song-item {
@@ -190,9 +191,9 @@
         .song-item:hover {
             border-color: var(--twitch-purple);
             background: var(--bg-card);
-            transform: translateY(-5px); /* 向上浮動 5px */
-            box-shadow: var(--hover-shadow); /* 套用動態陰影 */
-            z-index: 2; /* 浮動時層級提高，避免被其他卡片遮擋 */
+            transform: translateY(-5px);
+            box-shadow: var(--hover-shadow);
+            z-index: 2;
         }
 
         .song-info {
@@ -200,6 +201,8 @@
             flex-direction: column;
             overflow: hidden;
             flex: 1;
+            /* 關鍵修復：允許 flex 子元素縮小於內容寬度，避免過長文字撐破外層卡片 */
+            min-width: 0; 
             margin-right: 15px;
             cursor: pointer; 
         }
@@ -287,7 +290,7 @@
             flex-direction: column;
             gap: 8px;
             align-items: stretch;
-            min-width: 85px; /* 確保最小寬度，讓排版統一 */
+            min-width: 85px;
         }
 
         .info-btn, .copy-btn {
@@ -329,7 +332,7 @@
             background: var(--twitch-purple);
             color: white;
             box-shadow: 0 4px 12px rgba(145, 70, 255, 0.25);
-            transform: translateY(-2px); /* 輕微浮動帶來更好的點擊回饋 */
+            transform: translateY(-2px);
             border-color: var(--twitch-purple);
         }
 
@@ -414,11 +417,33 @@
             white-space: pre-wrap;
         }
 
+        /* =========================================
+           手機版響應式調整 (RWD Optimization)
+           ========================================= */
         @media (max-width: 768px) {
             .song-list { grid-template-columns: 1fr; }
             body { padding: 10px; }
             .theme-toggle-btn { top: 10px; }
-            .song-item:hover { transform: translateY(-2px); } /* 行動版浮動幅度減小 */
+            
+            .song-item { 
+                padding: 10px 12px; /* 手機版縮小內距，挪出空間 */
+            }
+            .song-item:hover { 
+                transform: translateY(-2px); /* 行動版浮動幅度減小 */
+            }
+            
+            .song-info {
+                margin-right: 10px;
+            }
+            
+            .action-group {
+                min-width: 75px; /* 按鈕群組在手機版微調變窄 */
+            }
+            
+            .info-btn, .copy-btn {
+                padding: 6px 10px; /* 手機版按鈕縮小，避免佔用太多文字空間 */
+                font-size: 0.8rem;
+            }
         }
     </style>
 </head>
