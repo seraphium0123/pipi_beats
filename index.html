@@ -186,7 +186,7 @@
             flex-direction: column;
             overflow: hidden;
             flex: 1;
-            margin-right: 10px;
+            margin-right: 15px;
             cursor: pointer; 
         }
 
@@ -203,25 +203,6 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-        }
-
-        .info-btn {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 1rem;
-            cursor: pointer;
-            padding: 2px 4px;
-            border-radius: 4px;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .info-btn:hover {
-            color: var(--twitch-purple);
-            background: rgba(145, 70, 255, 0.1);
         }
 
         .song-artist {
@@ -286,6 +267,37 @@
             box-shadow: 0 2px 4px rgba(255, 78, 78, 0.3);
         }
 
+        /* 右側按鈕群組區塊 */
+        .action-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: stretch; /* 讓兩個按鈕寬度一致 */
+        }
+
+        .info-btn {
+            background: var(--bg-input);
+            color: var(--text-main);
+            border: 1px solid var(--text-secondary);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: var(--transition);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .info-btn:hover {
+            border-color: var(--twitch-purple);
+            color: var(--twitch-purple);
+            background: rgba(145, 70, 255, 0.1);
+        }
+
         .copy-btn {
             background: var(--bg-input);
             color: var(--text-main);
@@ -297,6 +309,9 @@
             font-size: 0.8rem;
             transition: var(--transition);
             white-space: nowrap;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .copy-btn:hover {
@@ -580,16 +595,18 @@
                         <div class="song-info" onclick="InteractionSystem.openLyrics('${song.id}')">
                             <div class="song-title-row">
                                 <span class="song-title" title="${song.title}">${song.title}</span>
-                                <button class="info-btn" title="查看曲目介紹" onclick="event.stopPropagation(); InteractionSystem.openDescription('${song.id}')">
-                                    ℹ️
-                                </button>
                             </div>
                             <span class="song-artist" title="${song.artist}">${song.artist}</span>
                             ${this.createTags(song)}
                         </div>
-                        <button class="copy-btn" onclick="InteractionSystem.copy('${song.title}')">
-                            !sr
-                        </button>
+                        <div class="action-group">
+                            <button class="info-btn" title="查看曲目介紹" onclick="event.stopPropagation(); InteractionSystem.openDescription('${song.id}')">
+                                ℹ️ 介紹
+                            </button>
+                            <button class="copy-btn" onclick="InteractionSystem.copy('${song.title}')">
+                                !sr
+                            </button>
+                        </div>
                     </div>
                 `).join('');
             }
