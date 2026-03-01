@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>皮皮音樂台 Pipi Beats - 全曲目清單</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+TC:wght@400;700&display=swap"
+        rel="stylesheet">
     <style>
         /* =========================================
            CSS 負責樣式 (Standardized Styles)
@@ -25,7 +28,7 @@
             --tag-genre-bg: rgba(0, 245, 147, 0.1);
             --tag-genre-border: rgba(0, 245, 147, 0.3);
             --tag-genre-text: #00f593;
-            
+
             /* BPM 標籤色彩 - 暗色主題 */
             --bpm-slow-bg: rgba(52, 152, 219, 0.15);
             --bpm-slow-text: #5dade2;
@@ -57,7 +60,7 @@
             --tag-genre-bg: rgba(0, 138, 82, 0.1);
             --tag-genre-border: rgba(0, 138, 82, 0.3);
             --tag-genre-text: #008a52;
-            
+
             /* BPM 標籤色彩 - 亮色主題 */
             --bpm-slow-bg: rgba(41, 128, 185, 0.15);
             --bpm-slow-text: #2980b9;
@@ -72,7 +75,9 @@
             --modal-overlay: rgba(0, 0, 0, 0.5);
         }
 
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
 
         body {
             font-family: 'Inter', 'Noto Sans TC', sans-serif;
@@ -83,7 +88,8 @@
             display: flex;
             justify-content: center;
             transition: background-color 0.3s ease, color 0.3s ease;
-            overflow-x: hidden; /* 防止極端情況下的水平滾動 */
+            overflow-x: hidden;
+            /* 防止極端情況下的水平滾動 */
         }
 
         .container {
@@ -94,8 +100,13 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         header {
@@ -120,7 +131,7 @@
             align-items: center;
             justify-content: center;
             transition: var(--transition);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .theme-toggle-btn:hover {
@@ -134,6 +145,7 @@
             margin: 0;
             background: var(--primary-gradient);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
@@ -161,7 +173,7 @@
             font-size: 1.1rem;
             transition: var(--transition);
         }
-        
+
         #searchInput:focus {
             outline: none;
             border-color: var(--twitch-purple);
@@ -202,9 +214,9 @@
             overflow: hidden;
             flex: 1;
             /* 關鍵修復：允許 flex 子元素縮小於內容寬度，避免過長文字撐破外層卡片 */
-            min-width: 0; 
+            min-width: 0;
             margin-right: 15px;
-            cursor: pointer; 
+            cursor: pointer;
         }
 
         .song-title-row {
@@ -280,7 +292,7 @@
             color: #fff;
             border: none;
             font-weight: bold;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
             box-shadow: 0 2px 4px rgba(255, 78, 78, 0.3);
         }
 
@@ -293,7 +305,8 @@
             min-width: 85px;
         }
 
-        .info-btn, .copy-btn {
+        .info-btn,
+        .copy-btn {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -344,7 +357,7 @@
             box-shadow: 0 4px 12px rgba(0, 245, 147, 0.25);
             transform: translateY(0);
         }
-        
+
         .action-group svg {
             flex-shrink: 0;
         }
@@ -378,7 +391,7 @@
             max-height: 80vh;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
         }
 
         .modal-header {
@@ -421,32 +434,47 @@
            手機版響應式調整 (RWD Optimization)
            ========================================= */
         @media (max-width: 768px) {
-            .song-list { grid-template-columns: 1fr; }
-            body { padding: 10px; }
-            .theme-toggle-btn { top: 10px; }
-            
-            .song-item { 
-                padding: 10px 12px; /* 手機版縮小內距，挪出空間 */
+            .song-list {
+                grid-template-columns: 1fr;
             }
-            .song-item:hover { 
-                transform: translateY(-2px); /* 行動版浮動幅度減小 */
+
+            body {
+                padding: 10px;
             }
-            
+
+            .theme-toggle-btn {
+                top: 10px;
+            }
+
+            .song-item {
+                padding: 10px 12px;
+                /* 手機版縮小內距，挪出空間 */
+            }
+
+            .song-item:hover {
+                transform: translateY(-2px);
+                /* 行動版浮動幅度減小 */
+            }
+
             .song-info {
                 margin-right: 10px;
             }
-            
+
             .action-group {
-                min-width: 75px; /* 按鈕群組在手機版微調變窄 */
+                min-width: 75px;
+                /* 按鈕群組在手機版微調變窄 */
             }
-            
-            .info-btn, .copy-btn {
-                padding: 6px 10px; /* 手機版按鈕縮小，避免佔用太多文字空間 */
+
+            .info-btn,
+            .copy-btn {
+                padding: 6px 10px;
+                /* 手機版按鈕縮小，避免佔用太多文字空間 */
                 font-size: 0.8rem;
             }
         }
     </style>
 </head>
+
 <body>
 
     <div class="container">
@@ -464,7 +492,6 @@
         </div>
     </div>
 
-    <!-- 歌詞 Modal -->
     <div id="lyricsModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -475,7 +502,6 @@
         </div>
     </div>
 
-    <!-- 介紹 Modal -->
     <div id="descModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -519,7 +545,7 @@
             songListContainer: document.getElementById('songListContainer'),
             subtitle: document.querySelector('.subtitle'),
             themeToggleBtn: document.getElementById('themeToggleBtn'),
-            
+
             // 歌詞 Modal 快取
             lyricsModal: document.getElementById('lyricsModal'),
             modalTitle: document.getElementById('modalTitle'),
@@ -546,15 +572,15 @@
                     // 加入快取消除隨機值，防止瀏覽器讀取舊檔案
                     const fetchUrl = `${DEFAULT_CONFIG.dataSource}?t=${new Date().getTime()}`;
                     const response = await fetch(fetchUrl);
-                    
+
                     if (!response.ok) {
                         throw new Error(`[HTTP ${response.status}] 找不到 ${DEFAULT_CONFIG.dataSource} 檔案`);
                     }
-                    
+
                     const data = await response.json();
                     RuntimeState.allSongs = data;
                     RuntimeState.currentList = data;
-                    
+
                     RenderSystem.render(data);
                 } catch (error) {
                     console.error("DataLoader Error:", error);
@@ -586,7 +612,7 @@
                     if (!isNaN(bpmValue)) {
                         let bpmClass = 'bpm-medium';
                         let bpmLabel = '中';
-                        
+
                         if (bpmValue < DEFAULT_CONFIG.bpmThresholds.slow) {
                             bpmClass = 'bpm-slow';
                             bpmLabel = '慢';
@@ -594,7 +620,7 @@
                             bpmClass = 'bpm-fast';
                             bpmLabel = '快';
                         }
-                        
+
                         tagsHtml += `<span class="tag ${bpmClass}" title="BPM: ${song.bpm}">BPM ${song.bpm} (${bpmLabel})</span>`;
                     }
                 }
@@ -620,7 +646,7 @@
                 }
 
                 if (!tagsHtml) return '';
-                
+
                 return `
                     <div class="tag-group">
                         ${tagsHtml}
@@ -651,7 +677,6 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
                                 介紹
                             </button>
-                            <!-- 確保單引號也能被正確逃脫傳遞 -->
                             <button class="copy-btn" onclick="InteractionSystem.copy(event, '${song.title.replace(/'/g, "\\'")}')">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                                 !sr
@@ -700,7 +725,7 @@
                     const matchMainGenre = song.main_genre && song.main_genre.toLowerCase().includes(term);
                     const matchSubGenre = song.sub_genre && song.sub_genre.toLowerCase().includes(term);
                     const matchBpm = song.bpm && song.bpm.toString().includes(term);
-                    
+
                     return matchTitle || matchArtist || matchTags || matchMainGenre || matchSubGenre || matchBpm;
                 });
                 RenderSystem.render(RuntimeState.currentList);
@@ -712,11 +737,11 @@
                 navigator.clipboard.writeText(command).then(() => {
                     const btn = event.currentTarget; // 取得綁定事件的 button，而不是內部的 svg
                     const oldHtml = btn.innerHTML; // 保存原本的 HTML（含 SVG）
-                    
+
                     // 替換為打勾 Icon
                     btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> OK!`;
                     btn.classList.add('success');
-                    
+
                     setTimeout(() => {
                         btn.innerHTML = oldHtml;
                         btn.classList.remove('success');
@@ -728,15 +753,15 @@
             openLyrics(id) {
                 const song = RuntimeState.allSongs.find(s => s.id === id);
                 if (!song) return;
-                
+
                 DOM.modalTitle.textContent = song.title;
-                
+
                 let formattedLyrics = "暫無歌詞提供";
                 if (song.lyrics && song.lyrics.length > 0) {
                     // 將陣列合併，並使用正規表達式移除時間軸 (如 [00:13.71]) 讓閱讀更乾淨
                     formattedLyrics = song.lyrics.map(line => line.replace(/\[\d{2}:\d{2}\.\d{2}\]/g, '').trim()).join('\n');
                 }
-                
+
                 DOM.lyricsBody.textContent = formattedLyrics;
                 DOM.lyricsModal.classList.add('active');
             },
@@ -749,7 +774,7 @@
             openDescription(id) {
                 const song = RuntimeState.allSongs.find(s => s.id === id);
                 if (!song) return;
-                
+
                 DOM.descModalTitle.textContent = `[介紹] ${song.title}`;
                 DOM.descBody.textContent = song.description || "這首曲目暫無詳細介紹。";
                 DOM.descModal.classList.add('active');
@@ -763,13 +788,13 @@
         /* =========================================
            5. 初始化監聽 (Initialize)
            ========================================= */
-        
+
         // 主題切換監聽
         DOM.themeToggleBtn.addEventListener('click', () => InteractionSystem.toggleTheme());
 
         // 搜尋監聽
         DOM.searchInput.addEventListener('input', (e) => InteractionSystem.handleSearch(e));
-        
+
         // 歌詞 Modal 監聽
         DOM.closeModalBtn.addEventListener('click', () => InteractionSystem.closeLyrics());
         DOM.lyricsModal.addEventListener('click', (e) => {
@@ -787,4 +812,5 @@
 
     </script>
 </body>
+
 </html>
