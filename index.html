@@ -180,6 +180,65 @@
             box-shadow: 0 0 0 3px rgba(145, 70, 255, 0.2);
         }
 
+        /* 搜尋選項 (歌詞模糊比對) */
+        .search-options {
+            margin-top: 10px;
+            display: flex;
+            justify-content: flex-end;
+            padding: 0 5px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition);
+            user-select: none;
+        }
+
+        .checkbox-label:hover {
+            color: var(--text-main);
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            appearance: none;
+            background-color: var(--bg-input);
+            margin: 0;
+            font: inherit;
+            color: currentColor;
+            width: 1.15em;
+            height: 1.15em;
+            border: 1px solid var(--border-style);
+            border-radius: 4px;
+            display: grid;
+            place-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .checkbox-label input[type="checkbox"]::before {
+            content: "";
+            width: 0.65em;
+            height: 0.65em;
+            transform: scale(0);
+            transition: 120ms transform ease-in-out;
+            box-shadow: inset 1em 1em var(--twitch-purple);
+            background-color: var(--twitch-purple);
+            transform-origin: center;
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+        }
+
+        .checkbox-label input[type="checkbox"]:checked::before {
+            transform: scale(1);
+        }
+
+        .checkbox-label input[type="checkbox"]:checked {
+            border-color: var(--twitch-purple);
+        }
+
         .song-list {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -486,6 +545,12 @@
 
         <div class="search-wrapper">
             <input type="text" id="searchInput" placeholder="搜尋歌名、歌手、或分類標籤...">
+            <div class="search-options">
+                <label class="checkbox-label" title="開啟後可利用歌詞片段進行模糊搜尋">
+                    <input type="checkbox" id="lyricsSearchToggle">
+                    <span>開啟歌詞模糊搜尋</span>
+                </label>
+            </div>
         </div>
 
         <div id="songListContainer" class="song-list">
@@ -533,7 +598,8 @@
         const RuntimeState = {
             allSongs: [],
             currentList: [],
-            isDarkMode: true // 預設深色
+            isDarkMode: true, // 預設深色
+            searchLyrics: false // 記錄是否開啟歌詞模糊搜尋
         };
 
         /* =========================================
@@ -542,6 +608,7 @@
         const DOM = {
             channelTitle: document.getElementById('channelTitle'),
             searchInput: document.getElementById('searchInput'),
+            lyricsSearchToggle: document.getElementById('lyricsSearchToggle'),
             songListContainer: document.getElementById('songListContainer'),
             subtitle: document.querySelector('.subtitle'),
             themeToggleBtn: document.getElementById('themeToggleBtn'),
@@ -688,6 +755,11 @@
         };
 
         const InteractionSystem = {
+            // 處理正則表達式的特殊字元跳脫
+            escapeRegExp(string) {
+                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            },
+
             // 主題初始化
             initTheme() {
                 const savedTheme = localStorage.getItem(DEFAULT_CONFIG.themePrefKey);
@@ -717,8 +789,12 @@
             },
 
             handleSearch(e) {
-                const term = e.target.value.toLowerCase().trim();
+                // 如果沒有傳入 event (例如從 checkbox 觸發)，就直接讀取 input value
+                const term = (e ? e.target.value : DOM.searchInput.value).toLowerCase().trim();
+                const searchLyrics = RuntimeState.searchLyrics;
+
                 RuntimeState.currentList = RuntimeState.allSongs.filter(song => {
+                    // 1. 精準搜尋 (原邏輯凍結保留)
                     const matchTitle = song.title.toLowerCase().includes(term);
                     const matchArtist = song.artist.toLowerCase().includes(term);
                     const matchTags = song.tags && song.tags.some(tag => tag.toLowerCase().includes(term));
@@ -726,7 +802,24 @@
                     const matchSubGenre = song.sub_genre && song.sub_genre.toLowerCase().includes(term);
                     const matchBpm = song.bpm && song.bpm.toString().includes(term);
 
-                    return matchTitle || matchArtist || matchTags || matchMainGenre || matchSubGenre || matchBpm;
+                    const matchPrecise = matchTitle || matchArtist || matchTags || matchMainGenre || matchSubGenre || matchBpm;
+
+                    // 2. 歌詞模糊搜尋邏輯 (啟動時才執行)
+                    let matchLyrics = false;
+                    if (searchLyrics && term !== '' && song.lyrics && song.lyrics.length > 0) {
+                        // 移除歌詞時間軸與空白，轉小寫以利比對
+                        const pureLyrics = song.lyrics.map(line => line.replace(/\[\d{2}:\d{2}\.\d{2}\]/g, '').trim()).join('').toLowerCase();
+                        
+                        // 建立模糊比對的正則表達式，例如輸入 "風吹過" 會變成 /風.*?吹.*?過/
+                        const chars = term.replace(/\s+/g, '').split('');
+                        if (chars.length > 0) {
+                            const regexPattern = chars.map(char => InteractionSystem.escapeRegExp(char)).join('.*?');
+                            const regex = new RegExp(regexPattern);
+                            matchLyrics = regex.test(pureLyrics);
+                        }
+                    }
+
+                    return matchPrecise || matchLyrics;
                 });
                 RenderSystem.render(RuntimeState.currentList);
             },
@@ -792,8 +885,21 @@
         // 主題切換監聽
         DOM.themeToggleBtn.addEventListener('click', () => InteractionSystem.toggleTheme());
 
-        // 搜尋監聽
+        // 搜尋輸入監聽
         DOM.searchInput.addEventListener('input', (e) => InteractionSystem.handleSearch(e));
+
+        // 歌詞模糊搜尋開關監聽
+        DOM.lyricsSearchToggle.addEventListener('change', (e) => {
+            RuntimeState.searchLyrics = e.target.checked;
+            // 給予使用者視覺上的 Placeholder 提示
+            if (e.target.checked) {
+                DOM.searchInput.placeholder = "開啟歌詞模糊搜尋 (支援跳字比對，如: 風吹過)...";
+            } else {
+                DOM.searchInput.placeholder = "搜尋歌名、歌手、或分類標籤...";
+            }
+            // 狀態改變後立即觸發一次搜尋更新列表
+            InteractionSystem.handleSearch();
+        });
 
         // 歌詞 Modal 監聽
         DOM.closeModalBtn.addEventListener('click', () => InteractionSystem.closeLyrics());
