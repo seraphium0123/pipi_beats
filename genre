@@ -1,0 +1,93 @@
+[
+  {
+    "main_genre": "Alternative & Niche (另類與次文化)",
+    "sub_genres": [
+      "Dark Ambient / Horror",
+      "Denpa / Alt-Idol",
+      "Experimental",
+      "Folk / Symphonic Rock",
+      "Hyperpop / Breakcore",
+      "Spoken Word",
+      "World / Ethnic"
+    ]
+  },
+  {
+    "main_genre": "Chill & Lo-Fi (放鬆與低傳真)",
+    "sub_genres": [
+      "Bedroom Pop",
+      "Bossa Nova / Lounge",
+      "City-Pop",
+      "City-Pop（Chill Ver.）",
+      "Indie Folk / Chill Acoustic",
+      "J-Pop",
+      "Lo-Fi Hip Hop / Chillhop",
+      "R&B / Neo-Soul"
+    ]
+  },
+  {
+    "main_genre": "Electronic & Dance (電子與舞曲)",
+    "sub_genres": [
+      "City-Pop",
+      "Dance Pop",
+      "EDM / Trap / Future Bass",
+      "Hard Rock",
+      "J-Pop",
+      "Nu-Disco / Funk",
+      "Pop-Rock / Alt-Rock",
+      "Synth-Pop",
+      "Techno / Eurobeat"
+    ]
+  },
+  {
+    "main_genre": "Pop (流行)",
+    "sub_genres": [
+      "Acid Jazz / Urban Jazz",
+      "Acoustic Pop / Ballad",
+      "Bedroom Pop",
+      "City-Pop",
+      "Dance Pop",
+      "J-Pop",
+      "K-Pop",
+      "Nu-Disco / Funk",
+      "Pop-Rock / Alt-Rock",
+      "Shoegaze",
+      "Synth-Pop"
+    ]
+  },
+  {
+    "main_genre": "R&B, Jazz & Soul (爵士與靈魂)",
+    "sub_genres": [
+      "Acid Jazz / Urban Jazz",
+      "Bossa Nova / Lounge",
+      "City-Pop",
+      "Indie Folk / Chill Acoustic",
+      "R&B / Neo-Soul",
+      "Synth-Pop"
+    ]
+  },
+  {
+    "main_genre": "Rock & Metal (搖滾與金屬)",
+    "sub_genres": [
+      "Death Metal / Grindcore",
+      "Experimental",
+      "Hard Rock",
+      "J-Pop",
+      "J-Rock",
+      "Pop-Rock / Alt-Rock",
+      "Synth-Pop",
+      "Tw-Pop / Cantopop"
+    ]
+  },
+  {
+    "main_genre": "Traditional & Festive (國風與節慶)",
+    "sub_genres": [
+      "EDM / Trap / Future Bass",
+      "Enka / Kayokyoku",
+      "Folk / Symphonic Rock",
+      "Guofeng / China-wave",
+      "Lunar New Year (賀歲)",
+      "Nakasi / Cha-Cha",
+      "Tw-Pop / Cantopop"
+    ]
+  }
+]
