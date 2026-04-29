@@ -497,6 +497,75 @@
             white-space: pre-wrap;
         }
 
+        /* 分類檢視工具列 */
+        .category-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* 分類標籤篩選列 (預設隱藏) */
+        .genre-filter-bar {
+            display: none;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            padding: 12px 8px;
+            background: var(--bg-container);
+            border: var(--border-style);
+            border-radius: 8px;
+        }
+
+        .genre-filter-bar.active {
+            display: flex;
+        }
+
+        .genre-filter-btn {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-input);
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .genre-filter-btn:hover {
+            border-color: var(--twitch-purple);
+            color: var(--text-main);
+        }
+
+        .genre-filter-btn.selected {
+            background: var(--twitch-purple);
+            border-color: var(--twitch-purple);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(145, 70, 255, 0.35);
+        }
+
+        /* 次曲風群組標題 */
+        .sub-genre-header {
+            grid-column: 1 / -1;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 6px 4px 2px;
+            border-bottom: 1px solid var(--border-color);
+            margin-top: 8px;
+        }
+
+        .sub-genre-header:first-child {
+            margin-top: 0;
+        }
+
         /* =========================================
            手機版響應式調整 (RWD Optimization)
            ========================================= */
@@ -554,12 +623,18 @@
         <div class="search-wrapper">
             <input type="text" id="searchInput" placeholder="搜尋歌名、歌手、或分類標籤...">
             <div class="search-options">
-                <label class="checkbox-label" title="開啟後可利用歌詞片段進行模糊搜尋">
+                <label class="checkbox-label" title="開啟後可依主曲風篩選，並按次曲風分組顯示">
+                    <input type="checkbox" id="categoryViewToggle">
+                    <span>啟用分類檢視</span>
+                </label>
+                <label class="checkbox-label" title="開啟後可利用歌詞片段進行模糊搜尋" style="margin-left:16px;">
                     <input type="checkbox" id="lyricsSearchToggle">
                     <span>開啟歌詞模糊搜尋</span>
                 </label>
             </div>
         </div>
+
+        <div id="genreFilterBar" class="genre-filter-bar"></div>
 
         <div id="songListContainer" class="song-list">
         </div>
@@ -626,8 +701,10 @@
         const RuntimeState = {
             allSongs: [],
             currentList: [],
-            isDarkMode: true, // 預設深色
-            searchLyrics: false // 記錄是否開啟歌詞模糊搜尋
+            isDarkMode: true,
+            searchLyrics: false,
+            categoryViewEnabled: false,
+            activeGenre: null // 目前選中的主曲風，null 表示「全部」
         };
 
         /* =========================================
@@ -637,6 +714,8 @@
             channelTitle: document.getElementById('channelTitle'),
             searchInput: document.getElementById('searchInput'),
             lyricsSearchToggle: document.getElementById('lyricsSearchToggle'),
+            categoryViewToggle: document.getElementById('categoryViewToggle'),
+            genreFilterBar: document.getElementById('genreFilterBar'),
             songListContainer: document.getElementById('songListContainer'),
             subtitle: document.querySelector('.subtitle'),
             themeToggleBtn: document.getElementById('themeToggleBtn'),
@@ -676,6 +755,7 @@
                     RuntimeState.allSongs = data;
                     RuntimeState.currentList = data;
 
+                    GenreSystem.buildFilterBar(data);
                     RenderSystem.render(data);
                 } catch (error) {
                     console.error("DataLoader Error:", error);
@@ -750,16 +830,8 @@
                 `;
             },
 
-            render(list) {
-                // 動態更新副標題的曲目數量
-                DOM.subtitle.textContent = `共 ${list.length} 首曲目，點擊歌名看歌詞，點按鈕複製點歌！`;
-
-                if (list.length === 0) {
-                    DOM.songListContainer.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 20px; color: var(--text-secondary);">無符合結果</div>`;
-                    return;
-                }
-
-                DOM.songListContainer.innerHTML = list.map(song => `
+            songCard(song) {
+                return `
                     <div class="song-item">
                         <div class="song-info" role="button" tabindex="0" data-song-id="${escapeHtml(song.id)}">
                             <div class="song-title-row">
@@ -779,7 +851,60 @@
                             </button>
                         </div>
                     </div>
-                `).join('');
+                `;
+            },
+
+            render(list) {
+                DOM.subtitle.textContent = `共 ${list.length} 首曲目，點擊歌名看歌詞，點按鈕複製點歌！`;
+
+                if (list.length === 0) {
+                    DOM.songListContainer.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 20px; color: var(--text-secondary);">無符合結果</div>`;
+                    return;
+                }
+
+                // 分類檢視：依 sub_genre 分組
+                if (RuntimeState.categoryViewEnabled && RuntimeState.activeGenre) {
+                    const groups = new Map();
+                    list.forEach(song => {
+                        const key = song.sub_genre || '其他';
+                        if (!groups.has(key)) groups.set(key, []);
+                        groups.get(key).push(song);
+                    });
+
+                    let html = '';
+                    groups.forEach((songs, subGenre) => {
+                        html += `<div class="sub-genre-header">${escapeHtml(subGenre)}</div>`;
+                        html += songs.map(s => this.songCard(s)).join('');
+                    });
+                    DOM.songListContainer.innerHTML = html;
+                } else {
+                    DOM.songListContainer.innerHTML = list.map(s => this.songCard(s)).join('');
+                }
+            }
+        };
+
+        const GenreSystem = {
+            buildFilterBar(songs) {
+                const genres = [...new Set(songs.map(s => s.main_genre).filter(Boolean))].sort();
+
+                const allBtn = `<button class="genre-filter-btn selected" data-genre="">全部</button>`;
+                const genreBtns = genres.map(g =>
+                    `<button class="genre-filter-btn" data-genre="${escapeHtml(g)}">${escapeHtml(g)}</button>`
+                ).join('');
+
+                DOM.genreFilterBar.innerHTML = allBtn + genreBtns;
+            },
+
+            setActive(genre) {
+                RuntimeState.activeGenre = genre || null;
+                DOM.genreFilterBar.querySelectorAll('.genre-filter-btn').forEach(btn => {
+                    btn.classList.toggle('selected', btn.dataset.genre === (genre || ''));
+                });
+            },
+
+            getFilteredList(searchList) {
+                if (!RuntimeState.categoryViewEnabled || !RuntimeState.activeGenre) return searchList;
+                return searchList.filter(s => s.main_genre === RuntimeState.activeGenre);
             }
         };
 
@@ -822,8 +947,7 @@
                 const term = (e ? e.target.value : DOM.searchInput.value).toLowerCase().trim();
                 const searchLyrics = RuntimeState.searchLyrics;
 
-                RuntimeState.currentList = RuntimeState.allSongs.filter(song => {
-                    // 1. 精準搜尋 (原邏輯凍結保留)
+                const searched = RuntimeState.allSongs.filter(song => {
                     const matchTitle = song.title.toLowerCase().includes(term);
                     const matchArtist = song.artist.toLowerCase().includes(term);
                     const matchTags = song.tags && song.tags.some(tag => tag.toLowerCase().includes(term));
@@ -833,13 +957,9 @@
 
                     const matchPrecise = matchTitle || matchArtist || matchTags || matchMainGenre || matchSubGenre || matchBpm;
 
-                    // 2. 歌詞模糊搜尋邏輯 (啟動時才執行)
                     let matchLyrics = false;
                     if (searchLyrics && term !== '' && song.lyrics && song.lyrics.length > 0) {
-                        // 移除歌詞時間軸與空白，轉小寫以利比對
                         const pureLyrics = song.lyrics.map(line => line.replace(/\[\d{2}:\d{2}\.\d{2}\]/g, '').trim()).join('').toLowerCase();
-                        
-                        // 建立模糊比對的正則表達式，例如輸入 "風吹過" 會變成 /風.*?吹.*?過/
                         const chars = term.replace(/\s+/g, '').split('');
                         if (chars.length > 0) {
                             const regexPattern = chars.map(char => InteractionSystem.escapeRegExp(char)).join('.*?');
@@ -850,6 +970,8 @@
 
                     return matchPrecise || matchLyrics;
                 });
+
+                RuntimeState.currentList = GenreSystem.getFilteredList(searched);
                 RenderSystem.render(RuntimeState.currentList);
             },
 
@@ -914,6 +1036,27 @@
 
         // 搜尋輸入監聽 (含 debounce，避免每次按鍵觸發完整渲染)
         DOM.searchInput.addEventListener('input', debounce((e) => InteractionSystem.handleSearch(e), 200));
+
+        // 分類檢視開關監聽
+        DOM.categoryViewToggle.addEventListener('change', (e) => {
+            RuntimeState.categoryViewEnabled = e.target.checked;
+            if (e.target.checked) {
+                DOM.genreFilterBar.classList.add('active');
+            } else {
+                DOM.genreFilterBar.classList.remove('active');
+                GenreSystem.setActive(''); // 重設選中狀態為「全部」
+                RuntimeState.activeGenre = null;
+            }
+            InteractionSystem.handleSearch();
+        });
+
+        // 分類標籤列點擊委派
+        DOM.genreFilterBar.addEventListener('click', (e) => {
+            const btn = e.target.closest('.genre-filter-btn');
+            if (!btn) return;
+            GenreSystem.setActive(btn.dataset.genre);
+            InteractionSystem.handleSearch();
+        });
 
         // 歌詞模糊搜尋開關監聽
         DOM.lyricsSearchToggle.addEventListener('change', (e) => {
